@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "staging-02-mpeschke-org-env-subdomain" }
