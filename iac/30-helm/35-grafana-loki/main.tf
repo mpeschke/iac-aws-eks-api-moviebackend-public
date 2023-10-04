@@ -1,12 +1,12 @@
 locals {
-  aws_region       = "eu-west-1"
+  aws_region       = var.aws_region
   environment_name = var.env
   tags = {
     iac_env              = var.env
     iac_managed_by       = "terraform",
-    iac_source_cd        = "https://app.terraform.io/app/mpeschke/workspaces/${var.env}-35-mpeschke-org-helm-grafana-loki-stack",
+    iac_source_cd        = "https://app.terraform.io/app/mpeschke/workspaces/${local.environment_name}-35-mpeschke-org-helm-grafana-loki-stack",
     iac_source_repo      = "https://github.com/mpeschke/iac-aws-eks-api-moviebackend-public",
-    iac_source_repo_path = "mpeschke.org/iac/${var.env}/30-helm/35-grafana-loki",
+    iac_source_repo_path = "mpeschke.org/iac/${local.environment_name}/30-helm/35-grafana-loki",
     iac_owners           = "devops",
   }
 }
@@ -26,14 +26,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-
-    workspaces {
-      name = "prod-35-mpeschke-org-helm-grafana-loki-stack"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -46,7 +39,7 @@ data "terraform_remote_state" "eks" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-20-mpeschke-org-eks"
+      name = "${local.environment_name}-20-mpeschke-org-eks"
     }
   }
 }

@@ -1,8 +1,8 @@
 locals {
-  aws_region       = "eu-west-1"
-  environment_name = "prod"
+  aws_region       = var.aws_region
+  environment_name = var.env
   tags = {
-    iac_env              = "${local.environment_name}"
+    iac_env              = local.environment_name,
     iac_managed_by       = "terraform",
     iac_source_cd        = "https://app.terraform.io/app/mpeschke/workspaces/${local.environment_name}-20-mpeschke-org-eks",
     iac_source_repo      = "https://github.com/mpeschke/iac-aws-eks-api-moviebackend-public",
@@ -22,14 +22,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-
-    workspaces {
-      name = "prod-20-mpeschke-org-eks"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -42,7 +35,7 @@ data "terraform_remote_state" "vpc" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-10-mpeschke-org-vpc"
+      name = "${local.environment_name}-10-mpeschke-org-vpc"
     }
   }
 }
@@ -51,7 +44,7 @@ data "terraform_remote_state" "vpc" {
 # EKS
 #
 module "eks" {
-  source = "github.com/ManagedKube/kubernetes-ops//terraform-modules/aws/eks?ref=v1.0.30"
+  source = "github.com/ManagedKube/kubernetes-ops//terraform-modules/aws/eks?ref=v2.0.59"
 
   aws_region = local.aws_region
   tags       = local.tags
@@ -62,7 +55,7 @@ module "eks" {
   k8s_subnets    = data.terraform_remote_state.vpc.outputs.k8s_subnets
   public_subnets = data.terraform_remote_state.vpc.outputs.public_subnets
 
-  cluster_version = "1.20"
+  cluster_version = var.cluster_version
 
   # public cluster - kubernetes API is publicly accessible
   cluster_endpoint_public_access = true
@@ -72,34 +65,36 @@ module "eks" {
   ]
 
   # private cluster - kubernetes API is internal the the VPC
-  cluster_endpoint_private_access                = true
-  cluster_create_endpoint_private_access_sg_rule = true
-  cluster_endpoint_private_access_cidrs = [
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-    "100.64.0.0/16",
-  ]
+  cluster_endpoint_private_access = true
+  cluster_kms_enable_rotation     = false
 
   # Add whatever roles and users you want to access your cluster
-  map_users = [
-    {
-      userarn  = "arn:aws:iam::781388480524:user/matheus.peschke"
-      username = "matheus.peschke"
-      groups   = ["system:masters"]
-    },
-  ]
+  aws_auth_users = var.aws_auth_users
 
-  node_groups = {
+  eks_managed_node_groups = {
     ng1 = {
-      version          = "1.20"
-      disk_size        = 20
-      desired_capacity = 2
-      max_capacity     = 4
-      min_capacity     = 1
-      instance_types   = ["t3.small"]
-      additional_tags  = local.tags
-      k8s_labels       = {}
+      create_launch_template = false
+      launch_template_name   = ""
+
+      # Doc: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group
+      # (Optional) Force version update if existing pods are unable to be drained due to a pod disruption budget issue.
+      force_update_version = true
+
+      # doc: https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html#launch-template-custom-ami
+      # doc: https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami-bottlerocket.html
+      ami_type = "BOTTLEROCKET_x86_64"
+      platform = "bottlerocket"
+      version  = "1.23"
+
+      disk_size       = 20
+      desired_size    = 3
+      max_size        = 30
+      min_size        = 3
+      instance_types  = ["t2.small"]
+      additional_tags = {
+        Name = "ng1",
+      }
+      k8s_labels = {}
     }
   }
 }

@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-25-mpeschke-org-eks-cluster-autoscaler" }

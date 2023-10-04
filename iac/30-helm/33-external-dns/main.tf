@@ -1,6 +1,6 @@
 locals {
-  aws_region       = "eu-west-1"
-  environment_name = "prod"
+  aws_region       = var.aws_region
+  environment_name = var.env
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -26,14 +26,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-
-    workspaces {
-      name = "prod-33-mpeschke-org-helm-external-dns"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -46,7 +39,7 @@ data "terraform_remote_state" "eks" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-20-mpeschke-org-eks"
+      name = "${local.environment_name}-20-mpeschke-org-eks"
     }
   }
 }
@@ -57,7 +50,7 @@ data "terraform_remote_state" "route53_hosted_zone" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-02-mpeschke-org-k8s-subdomain"
+      name = "${local.environment_name}-03-mpeschke-org-k8s-subdomain"
     }
   }
 }
@@ -81,7 +74,7 @@ provider "helm" {
 # Helm - external-dns
 #
 module "external-dns" {
-  source = "github.com/ManagedKube/kubernetes-ops//terraform-modules/aws/helm/external-dns?ref=v1.0.28"
+  source = "github.com/ManagedKube/kubernetes-ops//terraform-modules/aws/helm/external-dns?ref=v2.0.59"
 
   aws_region                  = local.aws_region
   cluster_name                = local.environment_name
@@ -91,6 +84,7 @@ module "external-dns" {
   helm_values_2               = file("${path.module}/values.yaml")
 
   depends_on = [
-    data.terraform_remote_state.eks
+    data.terraform_remote_state.eks,
+    data.terraform_remote_state.route53_hosted_zone
   ]
 }

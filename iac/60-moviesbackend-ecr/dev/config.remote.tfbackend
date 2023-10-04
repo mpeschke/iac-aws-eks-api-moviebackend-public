@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-60-mpeschke-org-moviesbackend-ecr" }

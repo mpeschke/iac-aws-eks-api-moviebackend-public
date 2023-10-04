@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-32-mpeschke-org-helm-ingress-nginx" }

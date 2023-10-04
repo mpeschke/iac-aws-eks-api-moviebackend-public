@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-33-mpeschke-org-helm-external-dns" }

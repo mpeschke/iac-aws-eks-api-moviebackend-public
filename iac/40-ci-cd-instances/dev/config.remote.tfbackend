@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-40-mpeschke-org-ci-cd-instances" }

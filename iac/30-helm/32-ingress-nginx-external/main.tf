@@ -1,6 +1,6 @@
 locals {
-  aws_region       = "eu-west-1"
-  environment_name = "prod"
+  aws_region       = var.aws_region
+  environment_name = var.environment_name
   namespace        = "ingress-nginx"
   tags = {
     iac_env              = "${local.environment_name}"
@@ -27,14 +27,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-
-    workspaces {
-      name = "prod-32-mpeschke-org-helm-ingress-nginx"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -47,7 +40,7 @@ data "terraform_remote_state" "eks" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-20-mpeschke-org-eks"
+      name = "${local.environment_name}-20-mpeschke-org-eks"
     }
   }
 }
@@ -86,14 +79,10 @@ module "ingress-nginx-external" {
   # This is what you want to name the chart when deploying
   user_chart_name = "ingress-nginx"
   # The helm chart version you want to use
-  helm_version = "3.30.0"
+  helm_version = "4.5.2"
   # The namespace you want to install the chart into - it will create the namespace if it doesnt exist
   namespace = local.namespace
   # The helm chart values file
   helm_values = data.template_file.helm_values.rendered
-
-  depends_on = [
-    data.terraform_remote_state.eks
-  ]
 }
 

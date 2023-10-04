@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-51-mpeschke-org-rds-mysql-ddl" }

@@ -1,2 +1,0 @@
-organization = "mpeschke"
-workspaces { name = "prod-01-mpeschke-org-wildcard-domain" }

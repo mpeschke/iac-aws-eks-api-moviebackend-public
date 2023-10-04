@@ -1,6 +1,8 @@
 locals {
-  aws_region         = "eu-west-1"
-  environment_name   = "prod"
+  aws_region         = var.aws_region
+  environment_name   = var.env
+  letsencrypt_server = var.letsencrypt_stg == true ? "https://acme-staging-v02.api.letsencrypt.org/directory" : "https://acme-v02.api.letsencrypt.org/directory"
+  letsencrypt_email  = var.letsencrypt_email
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -30,14 +32,7 @@ terraform {
     }
   }
 
-  backend "remote" {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-
-    workspaces {
-      name = "prod-31-mpeschke-org-helm-cert-manager"
-    }
-  }
+  backend "remote" {}
 }
 
 provider "aws" {
@@ -50,18 +45,7 @@ data "terraform_remote_state" "eks" {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
     workspaces = {
-      name = "prod-20-mpeschke-org-eks"
-    }
-  }
-}
-
-data "terraform_remote_state" "route53_hosted_zone" {
-  backend = "remote"
-  config = {
-    # Update to your Terraform Cloud organization
-    organization = "mpeschke"
-    workspaces = {
-      name = "prod-02-mpeschke-org-k8s-subdomain"
+      name = "${local.environment_name}-20-mpeschke-org-eks"
     }
   }
 }
@@ -75,7 +59,7 @@ provider "helm" {
     cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
     exec {
       api_version = "client.authentication.k8s.io/v1alpha1"
-      args        = ["eks", "get-token", "--cluster-name", "${local.environment_name}"]
+      args        = ["eks", "get-token", "--cluster-name", local.environment_name]
       command     = "aws"
     }
   }
@@ -109,10 +93,10 @@ metadata:
   namespace: cert-manager
 spec:
   acme:
-    email: matt.peschke.prod@outlook.com
+    email: ${local.letsencrypt_email}
     privateKeySecretRef:
       name: letsencrypt
-    server: https://acme-v02.api.letsencrypt.org/directory
+    server: ${local.letsencrypt_server}
     solvers:
       - http01:
           ingress:
@@ -120,7 +104,6 @@ spec:
 YAML
   depends_on = [module.cert-manager]
 }
-
 
 #
 # Helm - cert-manager
@@ -135,13 +118,9 @@ module "cert-manager" {
   # This is what you want to name the chart when deploying
   user_chart_name = "cert-manager"
   # The helm chart version you want to use
-  helm_version = "v1.3.1"
+  helm_version = "v1.10.2"
   # The namespace you want to install the chart into - it will create the namespace if it doesnt exist
   namespace = "cert-manager"
   # The helm chart values file
   helm_values = data.template_file.helm_values.rendered
-
-  depends_on = [
-    data.terraform_remote_state.eks
-  ]
 }

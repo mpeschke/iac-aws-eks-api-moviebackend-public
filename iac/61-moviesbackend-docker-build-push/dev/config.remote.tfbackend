@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-61-mpeschke-org-moviesbackend-docker-build-push" }

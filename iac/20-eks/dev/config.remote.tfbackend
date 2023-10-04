@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-20-mpeschke-org-eks" }

@@ -24,15 +24,6 @@ terraform {
 }
 
 provider "aws" {
-  alias = "environment"
-  profile = "mpeschke-staging-tfc"
-  region = local.aws_region
-}
-
-provider "aws" {
-  alias = "parent"
-  access_key = var.PARENT_ACCESS_KEY
-  secret_key = var.PARENT_SECRET_KEY
   region = local.aws_region
 }
 
@@ -48,25 +39,24 @@ data "terraform_remote_state" "parent_domain" {
   }
 }
 
-#
-# Route53 Hosted Zone for the Environment
-#
-resource "aws_route53_zone" "environment" {
-  provider = aws.environment
+data "terraform_remote_state" "sub_domain" {
+  backend = "remote"
   
-  name = local.domain_name
-
-  tags = local.tags
+  config = {
+    # Update to your Terraform Cloud organization
+    organization = "mpeschke"
+    workspaces = {
+      name = "${local.environment_name}-03-mpeschke-org-k8s-subdomain"
+    }
+  }
 }
 
-resource "aws_route53_record" "ns_parent_to_environment" {
-  provider = aws.parent
-
+resource "aws_route53_record" "k8s-subdomain" {
   allow_overwrite = true
   name            = local.domain_name
   ttl             = 172800
   type            = "NS"
   zone_id         = data.terraform_remote_state.parent_domain.outputs.zone_id
 
-  records = aws_route53_zone.environment.name_servers
+  records = data.terraform_remote_state.sub_domain.outputs.name_servers
 }
