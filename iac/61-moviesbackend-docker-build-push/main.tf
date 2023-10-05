@@ -66,16 +66,9 @@ resource "null_resource" "push_moviesbackend" {
 # aws ecr-public get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin public.ecr.aws/o1m8n6c3/moviesbackend
 # sudo docker tag moviesbackend:0.1.0 public.ecr.aws/o1m8n6c3/moviesbackend:0.1.0
 # sudo docker push public.ecr.aws/o1m8n6c3/moviesbackend:0.1.0
+
   provisioner "remote-exec" {
       inline = [
-        # TODO: move awscli installation to 40-ci-cd-instances workspace.
-        "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"awscliv2.zip\"",
-        "unzip awscliv2.zip",
-        "sudo ./aws/install",
-        "sudo rm awscliv2.zip",
-        "mkdir -p .aws",
-        "echo \"[default]\nregion=eu-west-1\noutput=json\" > .aws/config",
-        "echo \"[default]\naws_access_key_id=${var.CI_CD_AWS_ACCESS_KEY_ID}\naws_secret_access_key=${var.CI_CD_AWS_SECRET_ACCESS_KEY}\" > .aws/credentials",
         "git clone --branch ${local.repository_branch} https://bitbucket.org/matheuspeschke/${local.repository_name}",
         # TODO: this mess should be fixed in a new release or use helm chart app to have WEBSERVPORT value passed as a templated value.
         #"sed -i 's/WEBSERVPORT=5000/WEBSERVPORT=80/' ${local.repository_name}/Dockerfile",

@@ -95,7 +95,7 @@ resource "aws_instance" "ci_cd_instances" {
   user_data = <<EOF
 #!/bin/bash
 apt-get update -y
-apt-get install unzip git docker.io -y
+apt-get install curl unzip git docker.io -y
 EOF
 
   tags = merge(

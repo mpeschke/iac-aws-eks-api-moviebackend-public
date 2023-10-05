@@ -21,3 +21,15 @@ variable "ci_cd_ssh_public_key" {
     type = string
     default = null
 }
+
+variable "CI_CD_AWS_ACCESS_KEY_ID" {
+    description = "The AWS access key ID with permissions to manage resources."
+    type = string
+    default = ""
+}
+
+variable "CI_CD_AWS_SECRET_ACCESS_KEY" {
+    description = "The AWS secret access key with permissions to manage resources."
+    type = string
+    default = ""
+}

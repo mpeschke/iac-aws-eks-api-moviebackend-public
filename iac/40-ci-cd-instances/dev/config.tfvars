@@ -6,3 +6,5 @@ ci_cd_ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOEEP50cskecZQ9IZate
 # The content of the private key should be one line, with new lines marked like this:
 # "-----BEGIN OPENSSH PRIVATE KEY-----\nAAAA\nBBBB\nCCCC\nDDDD\nEEEE\n-----END OPENSSH PRIVATE KEY-----"
 ci_cd_ssh_private_key = ""
+CI_CD_AWS_ACCESS_KEY_ID = ""
+CI_CD_AWS_SECRET_ACCESS_KEY = ""

@@ -3,5 +3,3 @@
 env = "dev"
 docker_tag = "0.1.0"
 repository_branch = "release/v0.1.0"
-CI_CD_AWS_ACCESS_KEY_ID = ""
-CI_CD_AWS_SECRET_ACCESS_KEY = ""
