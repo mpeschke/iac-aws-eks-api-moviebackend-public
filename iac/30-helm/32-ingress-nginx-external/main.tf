@@ -1,6 +1,6 @@
 locals {
   aws_region       = var.aws_region
-  environment_name = var.environment_name
+  environment_name = var.env
   namespace        = "ingress-nginx"
   tags = {
     iac_env              = "${local.environment_name}"

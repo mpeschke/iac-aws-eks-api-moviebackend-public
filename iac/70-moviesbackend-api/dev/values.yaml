@@ -41,7 +41,7 @@ deployment:
   containers:
   - name: moviesbackend
     image:
-      repository: public.ecr.aws/o1m8n6c3/moviesbackend
+      repository: public.ecr.aws/o8i1z9b2/moviesbackend
       tag: 0.1.0
       pullPolicy: Always
     command: []
@@ -61,7 +61,7 @@ deployment:
       # Values in perEnv will be local to an environment
       perEnv:
        - name: DATABASECONNECTION
-         value: mysql://root:{:h}W]+!rHhWp<(WWsEh@moviesbackend-aurora-mysql.cluster-cbdx2tbqytmd.eu-west-1.rds.amazonaws.com/burntdvds
+         value: mysql://burntdvds:BuRnTdVdS8902348.ovusoiud@moviesbackend-aurora-mysql.cluster-cpplozvqfo9h.eu-west-1.rds.amazonaws.com/burntdvds
        - name: CONFIGENV
          value: moviesbackend.config.TestingConfig
        - name: WORKERS
