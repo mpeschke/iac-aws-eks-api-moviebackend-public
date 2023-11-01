@@ -1,0 +1,1 @@
+A temporary folder to hold rendered yaml files from helm/terraform process.

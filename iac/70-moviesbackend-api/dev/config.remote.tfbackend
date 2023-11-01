@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "dev-70-mpeschke-org-moviesbackend-api" }

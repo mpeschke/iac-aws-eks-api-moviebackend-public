@@ -6,12 +6,12 @@
 replicaCount: 1
 
 nameOverride: ""
-fullnameOverride: "moviesbackend"
+fullnameOverride: "${fullnameoverride}"
 
-namespace: "moviesbackend"
+namespace: "${namespace}"
 
 labels: 
-  app: moviesbackend
+  app: ${app}
 
 #
 # Deployment variables
@@ -39,10 +39,10 @@ deployment:
   # containers definition
   #
   containers:
-  - name: moviesbackend
+  - name: ${container_name}
     image:
-      repository: public.ecr.aws/o8i1z9b2/moviesbackend
-      tag: 0.1.0
+      repository: ${repository}
+      tag: ${tag}
       pullPolicy: Always
     command: []
     # - foo
@@ -61,18 +61,18 @@ deployment:
       # Values in perEnv will be local to an environment
       perEnv:
        - name: DATABASECONNECTION
-         value: mysql://burntdvds:BuRnTdVdS8902348.ovusoiud@moviesbackend-aurora-mysql.cluster-cpplozvqfo9h.eu-west-1.rds.amazonaws.com/burntdvds
+         value: mysql://burntdvds:BuRnTdVdS8902348.ovusoiud@${mysql_rw_cluster}/burntdvds
        - name: CONFIGENV
-         value: moviesbackend.config.TestingConfig
+         value: ${configenv}
        - name: WORKERS
-         value: "2"
+         value: "${workers}"
        - name: WEBSERVPORT
-         value: "80"
+         value: "${container_port}"
 
     ports:
      - name: https
        protocol: TCP
-       containerPort: 80
+       containerPort: ${container_port}
        servicePort: 443
 
     livenessProbe: {}
@@ -161,7 +161,7 @@ servicemonitor:
 #
 service:
   type: ClusterIP
-  port: 80
+  port: ${container_port}
 
 #
 # Ingress variables
@@ -170,18 +170,18 @@ ingress:
   enabled: true
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
-    external-dns.alpha.kubernetes.io/hostname: moviesbackend.k8s.dev.mpeschke.org
+    external-dns.alpha.kubernetes.io/hostname: ${api_fqdn}
     kubernetes.io/ingress.class: nginx
     kubernetes.io/api: app/v1
   paths: 
     - path: /
-      servicePort: 80
+      servicePort: ${container_port}
   hosts:
-    - moviesbackend.k8s.dev.mpeschke.org
+    - ${api_fqdn}
   tls:
     - hosts:
-        - moviesbackend.k8s.dev.mpeschke.org
-      secretName: tls-moviesbackend
+        - ${api_fqdn}
+      secretName: ${tls_name}
 
 #
 # HPA

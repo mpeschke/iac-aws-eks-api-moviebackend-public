@@ -124,3 +124,7 @@ Testing it out with a value from the `ci` folder:
 ```
 helm template --values values.yaml --values ./ci/secrets-volumes-values.yaml ./
 ```
+
+# TODO: automate this workspace:
+a) Dynamic parameters for the templates coming from the other workspaces (database url, ecr url, etc)
+b) Host a helm server with this chart? Or have a null-resource running locally?
