@@ -9,3 +9,9 @@ variable "aws_region" {
     type = string
     default = null
 }
+
+variable "admin_password" {
+    description = "The admin password to authenticate in the Grafana deployed website."
+    type = string
+    default = null # 8L9xT6MCTGtmfSe
+}

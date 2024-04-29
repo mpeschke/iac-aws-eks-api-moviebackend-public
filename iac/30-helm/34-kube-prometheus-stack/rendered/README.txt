@@ -1,0 +1,1 @@
+A temporary folder to hold rendered yaml files from terraform process.

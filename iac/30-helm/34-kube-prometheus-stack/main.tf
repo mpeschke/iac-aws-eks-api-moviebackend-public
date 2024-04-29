@@ -1,6 +1,8 @@
 locals {
-  aws_region       = var.aws_region
-  environment_name = var.env
+  aws_region             = var.aws_region
+  environment_name       = var.env
+  grafana_fqdn           = "grafana.${data.terraform_remote_state.subdomain_records.outputs.domain_name}"
+  rendered_helm_values   = "./rendered/values.yaml"
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -48,6 +50,17 @@ data "terraform_remote_state" "eks" {
   }
 }
 
+data "terraform_remote_state" "subdomain_records" {
+  backend = "remote"
+  config = {
+    # Update to your Terraform Cloud organization
+    organization = "mpeschke"
+    workspaces = {
+      name = "${local.environment_name}-04-mpeschke-org-k8s-subdomain-records"
+    }
+  }
+}
+
 #
 # EKS authentication
 # # https://registry.terraform.io/providers/hashicorp/helm/latest/docs#exec-plugins
@@ -74,15 +87,32 @@ provider "kubectl" {
   load_config_file       = false
 }
 
+# Helm values file templating
+data "template_file" "helm_values" {
+  template = file("${path.module}/${var.env}/values.yaml.tpl")
+
+  # Parameters you want to pass into the values.yaml.tpl file to be templated
+  vars = {
+    admin_password = var.admin_password
+    grafana_fqdn = local.grafana_fqdn
+  }
+}
+
+resource "local_file" "rendered_helm_values" {
+  filename = local.rendered_helm_values
+  content  = data.template_file.helm_values.rendered
+}
+
 #
 # Helm - kube-prometheus-stack
 #
 module "kube-prometheus-stack" {
   source = "github.com/ManagedKube/kubernetes-ops//terraform-modules/aws/helm/kube-prometheus-stack?ref=v1.0.15"
 
-  helm_values = file("${path.module}/${local.environment_name}/values.yaml")
-
   depends_on = [
-    data.terraform_remote_state.eks
-  ]
+    data.terraform_remote_state.eks,
+    local_file.rendered_helm_values,
+    ]
+
+  helm_values = file("${path.module}/rendered/values.yaml")
 }

@@ -11,18 +11,18 @@ prometheus:
            requests:
              storage: 25Gi
 grafana:
-  adminPassword: 8L9xT6MCTGtmfSe
+  adminPassword: ${admin_password}
   ingress:
     enabled: true
     annotations:
       cert-manager.io/cluster-issuer: "letsencrypt"
-      external-dns.alpha.kubernetes.io/hostname: "grafana.k8s.dev.mpeschke.org"
+      external-dns.alpha.kubernetes.io/hostname: "${grafana_fqdn}"
       kubernetes.io/ingress.class: nginx
     hosts:
-    - grafana.k8s.dev.mpeschke.org
+    - ${grafana_fqdn}
     tls:
     - hosts:
-      - grafana.k8s.dev.mpeschke.org # This should match a DNS name in the Certificate
+      - ${grafana_fqdn} # This should match a DNS name in the Certificate
       secretName: tls-grafana # This should match the Certificate secretName
   additionalDataSources:
   - name: loki
