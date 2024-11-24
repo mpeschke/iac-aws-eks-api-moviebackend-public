@@ -32,3 +32,6 @@ override.tf.json
 # example: *tfplan*
 
 iac/70-moviesbackend-api/rendered/*.yaml
+
+# MacOS temporary files/folders.
+**/.DS_Store
