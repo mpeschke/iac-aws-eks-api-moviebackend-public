@@ -35,7 +35,7 @@ terraform apply
 
 All users are managed in a 'management' AWS Account. Cross Account Roles, User Groups and policies to configure users' authorization to access the environment accounts are automated by the https://bitbucket.org/matheuspeschke/iac-aws-shared project.
 
-Development, Staging and Production environments are deployed to completely separated AWS Accounts, grouped under the 'mpeschke.org' AWS Organization Unit.
+Development, Staging and Production environments are deployed to completely separate AWS Accounts, grouped under the 'mpeschke.org' AWS Organization Unit.
 
 ## Environments, Internet Domain, DNS
 
@@ -47,7 +47,7 @@ The wildcard configuration *.mpeschke.org DNS has been arbitrarily chosen to be 
 
 03-mpeschke-org-k8s-subdomain project creates the AWS Route53 Hosted Zones for dev and staging environments on their respective AWS Accounts.
 
-04-mpeschke-org-k8s-subdomain project adds the DNS records on the production account, routing DNS resolution from the production's DNS Hosted Zone to the proper environment's Hosted Zones.
+04-mpeschke-org-k8s-subdomain-records project adds the DNS records on the production account, routing DNS resolution from the production's DNS Hosted Zone to the proper environment's Hosted Zones.
 
 Securing these DNS integrations using DNSSEC signing is work in progress. It still needs to be completed (if possible, automated) and tested.
 
