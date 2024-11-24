@@ -27,17 +27,6 @@ provider "aws" {
   region = local.aws_region
 }
 
-# data "terraform_remote_state" "wildcard-domain" {
-#   backend = "remote"
-#   config = {
-#     # Update to your Terraform Cloud organization
-#     organization = "mpeschke"
-#     workspaces = {
-#       name = "prod-01-mpeschke-org-wildcard-domain"
-#     }
-#   }
-# }
-
 #
 # Route53 Hosted Zone
 #
@@ -48,13 +37,3 @@ module "subdomain_hostedzone" {
   tags        = local.tags
 }
 # TODO: Enable CloudWatch alarms to monitor critical DNS security issues. See https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html
-
-# resource "aws_route53_record" "k8s-subdomain" {
-#   allow_overwrite = true
-#   name            = local.domain_name
-#   ttl             = 172800
-#   type            = "NS"
-#   zone_id         = data.terraform_remote_state.wildcard-domain.outputs.zone_id
-
-#   records = module.subdomain_hostedzone.name_servers
-# }
