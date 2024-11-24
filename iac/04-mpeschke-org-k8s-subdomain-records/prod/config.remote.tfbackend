@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "prod-04-mpeschke-org-k8s-subdomain-records" }
