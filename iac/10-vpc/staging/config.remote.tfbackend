@@ -1,0 +1,2 @@
+organization = "mpeschke"
+workspaces { name = "staging-10-mpeschke-org-vpc" }

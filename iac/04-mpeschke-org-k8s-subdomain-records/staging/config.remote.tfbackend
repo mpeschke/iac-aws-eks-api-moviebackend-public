@@ -1,2 +1,2 @@
 organization = "mpeschke"
-workspaces { name = "dev-04-mpeschke-org-k8s-subdomain-records" }
+workspaces { name = "staging-04-mpeschke-org-k8s-subdomain-records" }
