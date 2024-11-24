@@ -86,11 +86,11 @@ module "eks" {
       platform = "bottlerocket"
       version  = "1.23"
 
-      disk_size       = 20
-      desired_size    = 3
-      max_size        = 30
-      min_size        = 3
-      instance_types  = ["t2.small"]
+      disk_size      = 20
+      desired_size   = 3
+      max_size       = 30
+      min_size       = 3
+      instance_types = ["t2.small"]
       additional_tags = {
         Name = "ng1",
       }

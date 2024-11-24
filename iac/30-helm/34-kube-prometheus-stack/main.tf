@@ -1,8 +1,8 @@
 locals {
-  aws_region             = var.aws_region
-  environment_name       = var.env
-  grafana_fqdn           = "grafana.${data.terraform_remote_state.subdomain_records.outputs.domain_name}"
-  rendered_helm_values   = "./rendered/values.yaml"
+  aws_region           = var.aws_region
+  environment_name     = var.env
+  grafana_fqdn         = "grafana.${data.terraform_remote_state.subdomain_records.outputs.domain_name}"
+  rendered_helm_values = "./rendered/values.yaml"
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -94,7 +94,7 @@ data "template_file" "helm_values" {
   # Parameters you want to pass into the values.yaml.tpl file to be templated
   vars = {
     admin_password = var.admin_password
-    grafana_fqdn = local.grafana_fqdn
+    grafana_fqdn   = local.grafana_fqdn
   }
 }
 
@@ -112,7 +112,7 @@ module "kube-prometheus-stack" {
   depends_on = [
     data.terraform_remote_state.eks,
     local_file.rendered_helm_values,
-    ]
+  ]
 
   helm_values = file("${path.module}/rendered/values.yaml")
 }

@@ -1,7 +1,7 @@
 locals {
-  aws_region  = var.aws_region
+  aws_region       = var.aws_region
   environment_name = var.env
-  domain_name = var.wildcard_domain_name
+  domain_name      = var.wildcard_domain_name
   tags = {
     iac_env              = var.env
     iac_managed_by       = "terraform",

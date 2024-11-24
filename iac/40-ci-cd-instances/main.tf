@@ -5,7 +5,7 @@ locals {
   ci_cd_key_name        = local.ci_cd_inst_base_name
   ci_cd_ssh_public_key  = var.ci_cd_ssh_public_key
   ci_cd_ssh_private_key = var.ci_cd_ssh_private_key
-  ci_cd_instances       = [
+  ci_cd_instances = [
     {
       instance_type     = "t2.small"
       ami_values        = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
@@ -13,10 +13,10 @@ locals {
       source_dest_check = false
       root_block_device = [
         {
-          encrypted     = true
-          volume_type   = "gp3"
-          throughput    = 200
-          volume_size   = 50
+          encrypted   = true
+          volume_type = "gp3"
+          throughput  = 200
+          volume_size = 50
         }
       ]
     }

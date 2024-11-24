@@ -1,6 +1,6 @@
 locals {
-  aws_region         = var.aws_region
-  environment_name   = var.env
+  aws_region       = var.aws_region
+  environment_name = var.env
   tags = {
     iac_env              = local.environment_name,
     iac_managed_by       = "terraform",
@@ -55,23 +55,23 @@ resource "null_resource" "db_setup" {
   }
 
   connection {
-    user = "ubuntu"
+    user        = "ubuntu"
     private_key = replace("${data.terraform_remote_state.ci_cd_instances.outputs.ci_cd_ssh_private_key}", "\\n", "\n")
-    host = data.terraform_remote_state.ci_cd_instances.outputs.ci_cd_eip_public_ips[0]
+    host        = data.terraform_remote_state.ci_cd_instances.outputs.ci_cd_eip_public_ips[0]
   }
 
   provisioner "file" {
-      source = "ddl.sql"
-      destination = "/home/ubuntu/ddl.sql"
+    source      = "ddl.sql"
+    destination = "/home/ubuntu/ddl.sql"
   }
 
   provisioner "remote-exec" {
-      inline = [
-        "sleep 90",
-        "sudo docker run --name movies-mysql --net=host -e MYSQL_ROOT_PASSWORD=\"WhAtEvEr1234.4321234\" -d mysql:5.7",
-        "sudo docker exec -i movies-mysql mysql --host=\"${data.terraform_remote_state.rds.outputs.db_cluster_rw_endpoint}\" --user=\"${data.terraform_remote_state.rds.outputs.db_cluster_master_user}\" --password=\"${data.terraform_remote_state.rds.outputs.db_cluster_master_password}\" --force < /home/ubuntu/ddl.sql",
-        "sudo docker stop movies-mysql",
-        "sudo docker rm movies-mysql"
-      ]
+    inline = [
+      "sleep 90",
+      "sudo docker run --name movies-mysql --net=host -e MYSQL_ROOT_PASSWORD=\"WhAtEvEr1234.4321234\" -d mysql:5.7",
+      "sudo docker exec -i movies-mysql mysql --host=\"${data.terraform_remote_state.rds.outputs.db_cluster_rw_endpoint}\" --user=\"${data.terraform_remote_state.rds.outputs.db_cluster_master_user}\" --password=\"${data.terraform_remote_state.rds.outputs.db_cluster_master_password}\" --force < /home/ubuntu/ddl.sql",
+      "sudo docker stop movies-mysql",
+      "sudo docker rm movies-mysql"
+    ]
   }
 }

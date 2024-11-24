@@ -11,6 +11,6 @@ output "ci_cd_ssh_public_key" {
 }
 
 output "ci_cd_ssh_private_key" {
-  value = local.ci_cd_ssh_private_key
+  value     = local.ci_cd_ssh_private_key
   sensitive = true
 }

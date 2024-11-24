@@ -1,7 +1,7 @@
 locals {
-  aws_region  = var.aws_region
+  aws_region       = var.aws_region
   environment_name = var.env
-  domain_name = var.env_domain_name
+  domain_name      = var.env_domain_name
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -29,7 +29,7 @@ provider "aws" {
 
 data "terraform_remote_state" "parent_domain" {
   backend = "remote"
-  
+
   config = {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"
@@ -41,7 +41,7 @@ data "terraform_remote_state" "parent_domain" {
 
 data "terraform_remote_state" "sub_domain" {
   backend = "remote"
-  
+
   config = {
     # Update to your Terraform Cloud organization
     organization = "mpeschke"

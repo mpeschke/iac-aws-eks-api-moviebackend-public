@@ -1,12 +1,12 @@
 locals {
-  aws_region            = var.aws_region
-  environment_name      = var.env
-  service_name          = var.service_name
-  api_fqdn              = "${var.service_name}.${data.terraform_remote_state.subdomain_records.outputs.domain_name}"
-  tls_name              = "tls-${var.service_name}"
-  chart_name            = "standard-application"
-  chart_version         = "1.0.11"
-  rendered_helm_values  = "./rendered/values.yaml"
+  aws_region           = var.aws_region
+  environment_name     = var.env
+  service_name         = var.service_name
+  api_fqdn             = "${var.service_name}.${data.terraform_remote_state.subdomain_records.outputs.domain_name}"
+  tls_name             = "tls-${var.service_name}"
+  chart_name           = "standard-application"
+  chart_version        = "1.0.11"
+  rendered_helm_values = "./rendered/values.yaml"
   tags = {
     iac_env              = "${local.environment_name}"
     iac_managed_by       = "terraform",
@@ -131,17 +131,17 @@ data "template_file" "helm_values" {
   # Parameters you want to pass into the values.yaml.tpl file to be templated
   vars = {
     fullnameoverride = local.service_name
-    namespace = local.service_name
-    app = local.service_name
-    container_name = local.service_name
-    repository = data.terraform_remote_state.ecr.outputs.ecr_uri
-    tag = data.terraform_remote_state.docker_build_push.outputs.docker_tag
+    namespace        = local.service_name
+    app              = local.service_name
+    container_name   = local.service_name
+    repository       = data.terraform_remote_state.ecr.outputs.ecr_uri
+    tag              = data.terraform_remote_state.docker_build_push.outputs.docker_tag
     mysql_rw_cluster = data.terraform_remote_state.rds.outputs.db_cluster_rw_endpoint
-    configenv = var.config_env
-    workers = var.workers
-    container_port = var.container_port
-    api_fqdn = local.api_fqdn
-    tls_name = local.tls_name
+    configenv        = var.config_env
+    workers          = var.workers
+    container_port   = var.container_port
+    api_fqdn         = local.api_fqdn
+    tls_name         = local.tls_name
   }
 }
 
@@ -154,39 +154,39 @@ resource "local_file" "rendered_helm_values" {
 # Equivalent to running the command:
 # helm template --values ${local.rendered_helm_values} ./
 data "helm_template" "api_helm_template" {
-  depends_on = [ local_file.rendered_helm_values ]
+  depends_on = [local_file.rendered_helm_values]
 
-  name       = local.chart_name
-  namespace  = local.service_name
+  name      = local.chart_name
+  namespace = local.service_name
 
   chart   = "./"
   version = local.chart_version
 
-# TODO: update here the templates you want to be part of the generated manifest.
+  # TODO: update here the templates you want to be part of the generated manifest.
   show_only = [
     "templates/deployment.yaml",
     "templates/ingress.yaml",
     "templates/service.yaml",
   ]
 
-  values = [ local_file.rendered_helm_values.content ]
+  values = [local_file.rendered_helm_values.content]
 }
 
 # Equivalent to running the command:
 # helm install moviesbackend ./ -n standard-application -f ${data.helm_template.api_helm_template.manifest} --create-namespace --namespace moviesbackend
 data "helm_release" "api_helm_release" {
-  depends_on = [ 
+  depends_on = [
     local_file.rendered_helm_values,
     helm_template.api_helm_template,
-    ]
+  ]
 
-  name       = local.chart_name
-  namespace  = local.service_name
+  name             = local.chart_name
+  namespace        = local.service_name
   create_namespace = true
 
   chart   = "./"
   version = local.chart_version
 
-  values = [ data.helm_template.api_helm_template.manifest ]
+  values = [data.helm_template.api_helm_template.manifest]
 }
 
